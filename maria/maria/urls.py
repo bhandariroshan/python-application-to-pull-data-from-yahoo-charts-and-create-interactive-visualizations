@@ -17,10 +17,16 @@ from django.conf.urls import url
 from django.contrib import admin
 from .views import HomeView
 
+from django.conf.urls import include
+from dataplot.views import ChartDataViewSet
+
+
+# Wire up our API using automatic URL routing.
+# Additionally, we include login URLs for the browsable API.
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(
-        r'^$', HomeView.as_view(),
-        name="home"
-    ),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^$', HomeView.as_view(), name="home"),
+    url('^chartdata/(?P<ticker>.+)/$', ChartDataViewSet.as_view()),
 ]

@@ -26,7 +26,7 @@
 <div style="width:100%; height: 200px;">
     <div style="margin-top: 20px; height: 40px;">
         <div class="dropdown">
-            <select style="float: right; margin-right: 10px;">
+            <select id="ddlTicker" style="float: right; margin-right: 10px;">
                 {% for each_ticker in tickers %}
                     <option value="{{each_ticker}}">{{each_ticker}}</option>
                 {% endfor %}
@@ -48,67 +48,8 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    var data = [
-            { 
-                x: Date.UTC(2013,5,2),
-                y: 0.7695,
-            },
-            {
-                x: Date.UTC(2013,5,3),
-                y:0.7648
-                
-            },
-            {
-                x: Date.UTC(2013,5,4),
-                y: 0.7645
-                
-            },
-            {
-                x: Date.UTC(2013,5,5),
-                y: 0.7638
-                
-            },
-            {
-                x: Date.UTC(2013,5,6),
-                y: 0.7549
 
-            },
-            {
-                x: Date.UTC(2013,5,7),
-                y: 0.7562
-                
-            },
-            {
-                x: Date.UTC(2013,5,9),
-                y: 0.7574
-            },
-            {
-                x: Date.UTC(2013,5,10),
-                y: 0.7543
-            },
-            {
-                x: Date.UTC(2013,5,11),
-                y: 0.7510
-            },
-            {
-                x: Date.UTC(2013,5,12),
-                y:0.7498
-            },
-            {
-                x: Date.UTC(2013,5,13),
-                y: 0.7477
-            },
-            {
-                x: Date.UTC(2013,5,14),
-                y: 0.7492
-            },
-            {
-                x: Date.UTC(2013,5,16),
-                y: 0.7487
-            },
-            ];
-    
-        
+    function draw_chart(data) {        
 
         new Highcharts.Chart({
             chart: {
@@ -116,7 +57,7 @@
 
             },
 
-            tooltip: {
+            /*tooltip: {
                 formatter: function () {
                     return  'Open: <b>' + this.point.open + '</b><br/>' + 
                             'Close: <b>' + this.point.close + '</b><br/>' + 
@@ -124,7 +65,7 @@
                             'Low: <b>' + this.point.low + '</b><br/>' +
                             'Volume: <b>' + this.point.volume + '</b><br/>';
                 }
-            },
+            },*/
 
             title: {
                 text: 'Stock Exchange Trading Data'
@@ -177,6 +118,42 @@
                 data: data
             }]
         });
+    }
+
+    function get_data_and_plot(){
+        var ticker = $('#ddlTicker').val();
+        var url = 'http://localhost:8000/chartdata/' + ticker + '/';
+        var data = [];
+
+        $.get(url, function(mydata) {
+          for (var i=0; i< mydata.length; i++){
+            var my_date = mydata[i]['date'].split('-');
+
+            console.log(my_date);
+
+            data.push({
+                x: Date.UTC(my_date[0], my_date[1], my_date[2]),
+                y:mydata[i]['adj_close'],
+                /*high: mydata[i]['high_value'],
+                low: mydata[i]['low_value'],
+                close: mydata[i]['close_value'],
+                open: mydata[i]['open_value'],
+                ticker: mydata[i]['ticker'],
+                volume: mydata[i]['volume']*/
+            });
+          }
+
+          draw_chart(data);
+        });
+    }
+
+    $('#ddlTicker').on('change', function(){
+        get_data_and_plot();
+    });
+
+    $(document).ready(function(){
+        get_data_and_plot();
+    });
 
 </script>
 
