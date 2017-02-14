@@ -3,6 +3,7 @@
 from django.shortcuts import render
 # from django.http import HttpResponseRedirect, Http404
 from django.views.generic import TemplateView
+from dataplot.models import ChartData
 
 
 class HomeView(TemplateView):
@@ -12,8 +13,17 @@ class HomeView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         """Method for get request of home page."""
+        t = ChartData.objects.values('ticker').distinct()
+        selected_ticker = 'IVZ'
+        tickers = []
+        for each_t in t:
+            tickers.append(each_t['ticker'])
+
         return render(
             request,
             self.template_name,
-            {}
+            {
+                'tickers': tickers,
+                'selected': selected_ticker
+            }
         )

@@ -83,7 +83,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.core.context_processors.request',
                 # Your stuff: custom template context processors go here
-                'application.context_processors.link',
             ],
         },
     },
