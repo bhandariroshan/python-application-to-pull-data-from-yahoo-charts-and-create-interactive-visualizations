@@ -1,0 +1,30 @@
+
+## To list chart of account 
+
+r2 = requests.get(base_url + "/api/resource/Account", params={"limit_page_length":1000},cookies=p.cookies)
+account_list = r2.json().get("data")
+
+
+#### To add general ledger
+gl_name = # name of gl
+parent_head = # parent head
+company = # company name
+group_ledger = {
+	"doctype": "Account",
+	"account_name": gl_name,
+	"parent_account": parent_head,
+	"company": company,
+	"is_group": 0, # 1 if group
+	"account_type": None,
+	"account_currency": None
+}
+
+
+data = {"data": json.dumps(group_ledger)}
+
+request_post = requests.post(
+    base_url + "/api/resource/Account",
+    data = data,
+    cookies=p.cookies
+)
+print "insert", request_post.text[:10]
