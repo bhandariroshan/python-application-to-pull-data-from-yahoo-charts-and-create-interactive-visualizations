@@ -100,8 +100,8 @@ DATABASES = {
         'NAME': 'mariadb',
         'HOST': 'localhost',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'postgrs',
-        'PASSWORD': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': '',
         'PORT': 5432
     }
 }
