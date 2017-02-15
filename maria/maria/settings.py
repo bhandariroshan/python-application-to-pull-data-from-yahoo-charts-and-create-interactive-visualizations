@@ -25,7 +25,7 @@ SECRET_KEY = '_ruq9%w6m-4s7!j(n--r3_z@tt2v3_8z_flt6t7w(b=&87(08i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path('dataplot')
 
