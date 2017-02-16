@@ -13,6 +13,10 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/fontawesomemin.css' %}">
 </head>
 
 <body>
@@ -49,53 +53,194 @@
     </div>
 
     <div style="margin-top: 10px;height: 50px;background: #c3c3c3;" class="row">
-        <div class="col-sm-3">
-            <div class="dropdown">
+        <div class="col-sm-1" style="width:auto;">
+            <div class="dropdown" style="margin:8px;">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <span style="margin-left:10px;">Add Indicator</span>
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-              </div>
+              <ul class="dropdown-menu" style="width:400px; margin-left:10px;">
+                <li style="height:30px;">
+                    <span style="margin-left:10px;">Simple Moving Average (SMA) </span>
+                    <span>
+                        <a href="#">
+                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                        </a>
+                    </span>
+                    
+                </li>
+
+                <li style="height:30px;">
+                    <span style="margin-left:10px;">Exponential Moving Average (EMA) </span>
+                    <span>
+                        <a href="#">
+                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                        </a>
+                    </span>
+                    
+                </li>
+
+                <li style="height:30px;">
+                    <span style="margin-left:10px;">Money Flow Index (MFI) </span>
+                    <span>
+                        <a href="#">
+                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                        </a>
+                    </span>
+                    
+                </li>
+
+                <li style="height:30px;">
+                    <span style="margin-left:10px;">Moving Average Convergence Difference (MACD) </span>
+                    <span>
+                        <a href="#">
+                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                        </a>
+                    </span>
+                    
+                </li>
+
+                <li style="height:30px;">
+                    <span style="margin-left:10px;">Relative Strength Index (RSI) </span>
+                    <span>
+                        <a href="#">
+                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                        </a>
+                    </span>
+                    
+                </li>
+                <li style="height:30px;">
+                    <span style="margin-left:10px;">Bollinger Band(BB) </span>
+                    <span>
+                        <a href="#">
+                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                        </a>
+                    </span>
+                    
+                </li>
+                <li style="height:30px;">
+                    <span style="margin-left:10px;">Stochastic Oscilator </span>
+                    <span>
+                        <a href="#">
+                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                        </a>
+                    </span>
+                    
+                </li>
+              </ul>
             </div>
         </div>
-        <div class="col-sm-3">
-            <div class="dropdown">
+        <div class="col-sm-1">
+            <div class="dropdown" style="margin:8px;">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <span style="margin-left:10px;">Compare</span>
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-              </div>
-            </div>            
+              <ul class="dropdown-menu">
+                <li style="height: 100px; width: 375px;">
+                    <input type="text" name="" style="width:90%;margin: 10px;">
+                    <div class="row" style="margin: 10px;">
+                        <span class="col-sm-4">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            <span style="margin-left: 10px;">DOW</span>
+                        </span>
+                        <span class="col-sm-4">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            <span style="margin-left: 10px;">NASDAQ</span>
+                        </span>
+                        <span class="col-sm-4">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            <span style="margin-left: 10px;">S&P500</span>
+                        </span>
+                    </div>
+                </li>
+              </ul>
+            </div>
         </div>
-        <div class="col-sm-3">
-            <div class="dropdown">
+        <div class="col-sm-1">
+            <div class="dropdown" style="margin:8px;">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
+                <i class="fa fa-sort-desc" aria-hidden="true"></i>
+                <span style="margin-left: 10px">1Y  Max</span>
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-              </div>
-            </div>            
+              <ul class="dropdown-menu">
+                    <li style="height: 20px; width: 300px;">
+                        <div class="row" style="margin: 10px;">
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">1d</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">5d</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">1m</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">3m</a>
+                            </span>
+                        </div>
+                    </li>
+
+                    <li style="height: 20px; width: 300px;">
+                        <div class="row" style="margin: 10px;">
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">1d</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">5d</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">1m</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">3m</a>
+                            </span>
+                        </div>
+                    </li>
+
+                    <li style="height: 20px; width: 300px;">
+                        <div class="row" style="margin: 10px;">
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">6m</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">YTD</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">1Y</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">2Y</a>
+                            </span>
+                        </div>
+                    </li>
+
+                    <li style="height: 20px; width: 300px;">
+                        <div class="row" style="margin: 10px;">
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">5Y</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">10Y</a>
+                            </span>
+                            <span class="col-sm-3">
+                                <a href="#" style="margin-left: 10px;">Max</a>
+                            </span>
+                            <span class="col-sm-3">
+                                
+                            </span>
+                        </div>
+                    </li>
+              </ul>
+            </div>
         </div>
-        <div class="col-sm-3">
-            <div class="dropdown">
+        <div class="col-sm-1">
+            <div class="dropdown" style="margin:8px;">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Dropdown button
+                <i class="fa fa-refresh" aria-hidden="true"></i>
+                <span style="margin-left:10px;">Reset</span>
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-              </div>
-            </div>            
+            </div>
         </div>
     </div>
     <div id="container" style="min-width: 310px; height: 400px;border: 4px solid #d4d0d0;"></div>
@@ -193,8 +338,6 @@
         $.get(url, function(mydata) {
           for (var i=0; i< mydata.length; i++){
             var my_date = mydata[i]['date'].split('-');
-
-            console.log(my_date);
 
             data.push({
                 x: Date.UTC(my_date[0], my_date[1], my_date[2]),

@@ -25,6 +25,10 @@ SECRET_KEY = '_ruq9%w6m-4s7!j(n--r3_z@tt2v3_8z_flt6t7w(b=&87(08i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
+APPS_DIR = ROOT_DIR.path('maria')
+
+
 ALLOWED_HOSTS = ['*']
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
 APPS_DIR = ROOT_DIR.path('dataplot')
@@ -143,7 +147,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
+# STATIC FILE CONFIGURATION
+# ------------------------------------------------------------------------------
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-root
+STATIC_ROOT = str(ROOT_DIR('staticfiles'))
+
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = '/static/'
+
+# See: https://docs.djangoproject.com/en/dev/ref/contrib/s4taticfiles/#std:setting-STATICFILES_DIRS
+STATICFILES_DIRS = (
+    str(APPS_DIR.path('static')),
+)
+
+
+# See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
