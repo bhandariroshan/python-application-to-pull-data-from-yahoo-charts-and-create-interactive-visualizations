@@ -46,23 +46,20 @@ def scrap_and_save_data(sector_tickers, start, end):
                 str(each_ticker) + \
                 "&a=0&b=13&c=2017" + "&d=1&e=13&f=2017" + "&g=d&ignore=.csv"
             s = requests.get(url).content
-            try:
-                df = pd.read_csv(io.StringIO(s.decode('utf-8')))
-                for index, row in df.iterrows():
-                    cd = ChartData()
-                    cd.ticker = each_ticker
-                    cd.company_name = ""
-                    cd.sector = sector
-                    cd.date = row['Date']
-                    cd.open_value = row['Open']
-                    cd.close_value = row['Close']
-                    cd.high_value = row['High']
-                    cd.low_value = row['Low']
-                    cd.volume = row['Volume']
-                    cd.adj_close = row['Adj Close']
-                    cd.save()
-            except:
-                continue
+            df = pd.read_csv(io.StringIO(s.decode('utf-8')))
+            for index, row in df.iterrows():
+                cd = ChartData()
+                cd.ticker = each_ticker
+                cd.company_name = ""
+                cd.sector = sector
+                cd.date = row['Date']
+                cd.open_value = row['Open']
+                cd.close_value = row['Close']
+                cd.high_value = row['High']
+                cd.low_value = row['Low']
+                cd.volume = row['Volume']
+                cd.adj_close = row['Adj Close']
+                cd.save()
 
 
 def get_snp500():
