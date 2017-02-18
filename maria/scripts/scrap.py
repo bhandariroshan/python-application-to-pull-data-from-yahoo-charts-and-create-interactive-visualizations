@@ -12,8 +12,8 @@ from dataplot.models import ChartData
 
 
 SITE = "http://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-START = datetime(1900, 1, 1, 0, 0, 0, 0, pytz.utc)
-END = datetime.today().utcnow()
+# START = datetime(1900, 1, 1, 0, 0, 0, 0, pytz.utc)
+today = datetime.today().utcnow()
 
 
 def scrape_list(site):
@@ -38,33 +38,83 @@ def scrape_list(site):
     return sector_tickers
 
 
-def scrap_and_save_data(sector_tickers, start, end):
-    for sector, tickers in sector_tickers.items():
-        print('Downloading data from Yahoo for %s sector' % sector)
-        for each_ticker in tickers:
-            url = "http://chart.finance.yahoo.com/table.csv?s=" + \
-                str(each_ticker) + \
-                "&a=0&b=13&c=2017" + "&d=1&e=13&f=2017" + "&g=d&ignore=.csv"
-            s = requests.get(url).content
-            df = pd.read_csv(io.StringIO(s.decode('utf-8')))
-            for index, row in df.iterrows():
-                cd = ChartData()
-                cd.ticker = each_ticker
-                cd.company_name = ""
-                cd.sector = sector
+def scrap_and_save_data(sector_tickers):
+    # for sector, tickers in sector_tickers.items():
+    #     print('Downloading data from Yahoo for %s sector' % sector)
+    #     for each_ticker in tickers:
+    #         start_day = '0'
+    #         end_day = '18'
+    #         start_month = '10'
+    #         end_month = '1'
+    #         start_year = '2000'
+    #         end_year = '2017'
+    #         url = "http://chart.finance.yahoo.com/table.csv?s=" + \
+    #             str(each_ticker) + \
+    #             "&a=" + start_day + "&b=" + start_month + "&c=" + \
+    #             start_year + "&d=" + end_day + "&e=" + end_month + \
+    #             "&f=" + end_year + "&g=d&ignore=.csv"
+    #         s = requests.get(url).content
+    #         df = pd.read_csv(io.StringIO(s.decode('utf-8')), error_bad_lines=False)
+    #         for index, row in df.iterrows():
+    #             cd = ChartData()
+    #             cd.ticker = each_ticker
+    #             cd.company_name = ""
+    #             cd.sector = sector
+    #             try:
+    #                 cd.date = row['Date']
+
+    #             except:
+    #                 continue
+
+    #             cd.open_value = float(row['Open'])
+    #             cd.close_value = float(row['Close'])
+    #             cd.high_value = float(row['High'])
+    #             cd.low_value = float(row['Low'])
+    #             cd.volume = int(row['Volume'])
+    #             cd.adj_close = float(row['Adj Close'])
+
+    #             cd.save()
+
+    sec = ['DJI', 'GSPC', 'IXIC']
+    for each_sec in sec:
+        print('Downloading data from' + each_sec)
+        start_day = '0'
+        end_day = '18'
+        start_month = '10'
+        end_month = '1'
+        start_year = '2000'
+        end_year = '2017'
+
+        url = "http://chart.finance.yahoo.com/table.csv?s=^" + each_sec + \
+            "&a=" + start_day + "&b=" + start_month + "&c=" + \
+            start_year + "&d=" + end_day + "&e=" + end_month + \
+            "&f=" + end_year + "&g=d&ignore=.csv"
+
+        s = requests.get(url).content
+        df = pd.read_csv(io.StringIO(s.decode('utf-8')), error_bad_lines=False)
+        for index, row in df.iterrows():
+            cd = ChartData()
+            cd.ticker = ""
+            cd.company_name = "DJI"
+            cd.sector = ""
+            try:
                 cd.date = row['Date']
-                cd.open_value = row['Open']
-                cd.close_value = row['Close']
-                cd.high_value = row['High']
-                cd.low_value = row['Low']
-                cd.volume = row['Volume']
-                cd.adj_close = row['Adj Close']
-                cd.save()
+            except:
+                continue
+
+            cd.open_value = float(row['Open'])
+            cd.close_value = float(row['Close'])
+            cd.high_value = float(row['High'])
+            cd.low_value = float(row['Low'])
+            cd.volume = int(row['Volume'])
+            cd.adj_close = float(row['Adj Close'])
+
+            cd.save()
 
 
 def get_snp500():
     sector_tickers = scrape_list(SITE)
-    scrap_and_save_data(sector_tickers, START, END)
+    scrap_and_save_data(sector_tickers)
 
 if __name__ == '__main__':
     get_snp500()

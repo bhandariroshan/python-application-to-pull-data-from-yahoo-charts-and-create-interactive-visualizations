@@ -42,10 +42,10 @@
         <div id="search" style="" class="input-group col-sm-4">
           <div class="row">
               <div class="col-sm-10">
-                  <input type="text" class="form-control" placeholder="Company Ticker" aria-describedby="basic-addon2">
+                  <input type="text" id="inpSearch" class="form-control" placeholder="Company Ticker" aria-describedby="basic-addon2">
               </div>
               <div class="col-sm-2">
-                <button style="float:left" class="btn btn-primary btn-large">search</button>  
+                <button id="btnSearch" style="float:left" class="btn btn-primary btn-large">search</button>  
               </div>
           </div>
         </div>
@@ -161,39 +161,22 @@
             <div class="dropdown" style="margin:8px;">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-sort-desc" aria-hidden="true"></i>
-                <span style="margin-left: 10px">1Y  Max</span>
+                <span id="timeSet" style="margin-left: 10px">1Y</span>
               </button>
               <ul class="dropdown-menu">
                     <li style="height: 20px; width: 300px;">
                         <div class="row" style="margin: 10px;">
                             <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">1d</a>
+                                <a onclick="get_data_and_plot('1m')" href="#" style="margin-left: 10px;">1m</a>
                             </span>
                             <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">5d</a>
+                                <a href="#" onclick="get_data_and_plot('3m')" style="margin-left: 10px;">3m</a>
                             </span>
                             <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">1m</a>
+                                <a onclick="get_data_and_plot('6m')" href="#" style="margin-left: 10px;">6m</a>
                             </span>
                             <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">3m</a>
-                            </span>
-                        </div>
-                    </li>
-
-                    <li style="height: 20px; width: 300px;">
-                        <div class="row" style="margin: 10px;">
-                            <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">6m</a>
-                            </span>
-                            <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">YTD</a>
-                            </span>
-                            <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">1Y</a>
-                            </span>
-                            <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">2Y</a>
+                                <a onclick="get_data_and_plot('1Y')" href="#" style="margin-left: 10px;">1Y</a>
                             </span>
                         </div>
                     </li>
@@ -201,16 +184,17 @@
                     <li style="height: 20px; width: 300px;">
                         <div class="row" style="margin: 10px;">
                             <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">5Y</a>
+                                <a onclick="get_data_and_plot('2Y')" href="#" style="margin-left: 10px;">2Y</a>
+                            </span>
+
+                            <span class="col-sm-3">
+                                <a onclick="get_data_and_plot('5Y')" href="#" style="margin-left: 10px;">5Y</a>
                             </span>
                             <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">10Y</a>
+                                <a onclick="get_data_and_plot('10Y')" href="#" style="margin-left: 10px;">10Y</a>
                             </span>
                             <span class="col-sm-3">
-                                <a href="#" style="margin-left: 10px;">Max</a>
-                            </span>
-                            <span class="col-sm-3">
-                                
+                                <a onclick="get_data_and_plot('max')" href="#" style="margin-left: 10px;">Max</a>
                             </span>
                         </div>
                     </li>
@@ -247,9 +231,9 @@
         new Highcharts.Chart({
             chart: {
                 renderTo: 'container',
+                /*zoomType: 'x'*/
 
             },
-
             /*tooltip: {
                 formatter: function () {
                     return  'Open: <b>' + this.point.open + '</b><br/>' + 
@@ -259,14 +243,13 @@
                             'Volume: <b>' + this.point.volume + '</b><br/>';
                 }
             },*/
-
             title: {
                 text: 'Stock Exchange Trading Data'
             },
-            subtitle: {
+            /*subtitle: {
                 text: document.ontouchstart === undefined ?
                         'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-            },
+            },*/
             xAxis: {
                 type: 'datetime'
             },
@@ -280,6 +263,7 @@
             },
             plotOptions: {
                 area: {
+                    cropThreshold: 5,
                     fillColor: {
                         linearGradient: {
                             x1: 0,
@@ -313,9 +297,17 @@
         });
     }
 
-    function get_data_and_plot(){
+    $('#btnSearch').on('click', function(){
+        var search_text = $('#inpSearch').val();
+        get_data_and_plot('1Y', search_text)
+    });
+
+    function get_data_and_plot(mytime='1Y', search_text=""){
         var ticker = $('#ddlTicker').val();
-        var url = '/chartdata/' + ticker + '/';
+
+        $('#timeSet').html(mytime);
+
+        var url = '/chartdata/' + ticker + '/' + mytime + '/';
         var data = [];
 
         $.get(url, function(mydata) {
@@ -323,9 +315,9 @@
             var my_date = mydata[i]['date'].split('-');
 
             data.push({
-                x: Date.UTC(my_date[0], my_date[1], my_date[2]),
-                y:mydata[i]['adj_close'],
-                /*high: mydata[i]['high_value'],
+                x: Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                y:mydata[i]['adj_close'],/*
+                high: mydata[i]['high_value'],
                 low: mydata[i]['low_value'],
                 close: mydata[i]['close_value'],
                 open: mydata[i]['open_value'],

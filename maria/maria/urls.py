@@ -28,5 +28,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^$', HomeView.as_view(), name="home"),
-    url('^chartdata/(?P<ticker>.+)/$', ChartDataViewSet.as_view()),
+    url('^chartdata/(?P<ticker>.+)/(?P<time>.+)$', ChartDataViewSet.as_view()),
 ]
