@@ -262,6 +262,9 @@
                 enabled: false
             },
             plotOptions: {
+                series:{
+                    turboThreshold:5000//set it to a larger threshold, it is by default to 1000
+                },
                 area: {
                     cropThreshold: 5,
                     fillColor: {
@@ -303,11 +306,14 @@
     });
 
     function get_data_and_plot(mytime='1Y', search_text=""){
-        var ticker = $('#ddlTicker').val();
+        if (search_text==""){
+            search_text = $('#ddlTicker').val();
+            
+        }
 
         $('#timeSet').html(mytime);
 
-        var url = '/chartdata/' + ticker + '/' + mytime + '/';
+        var url = '/chartdata/' + search_text + '/' + mytime + '/';
         var data = [];
 
         $.get(url, function(mydata) {

@@ -39,41 +39,41 @@ def scrape_list(site):
 
 
 def scrap_and_save_data(sector_tickers):
-    # for sector, tickers in sector_tickers.items():
-    #     print('Downloading data from Yahoo for %s sector' % sector)
-    #     for each_ticker in tickers:
-    #         start_day = '0'
-    #         end_day = '18'
-    #         start_month = '10'
-    #         end_month = '1'
-    #         start_year = '2000'
-    #         end_year = '2017'
-    #         url = "http://chart.finance.yahoo.com/table.csv?s=" + \
-    #             str(each_ticker) + \
-    #             "&a=" + start_day + "&b=" + start_month + "&c=" + \
-    #             start_year + "&d=" + end_day + "&e=" + end_month + \
-    #             "&f=" + end_year + "&g=d&ignore=.csv"
-    #         s = requests.get(url).content
-    #         df = pd.read_csv(io.StringIO(s.decode('utf-8')), error_bad_lines=False)
-    #         for index, row in df.iterrows():
-    #             cd = ChartData()
-    #             cd.ticker = each_ticker
-    #             cd.company_name = ""
-    #             cd.sector = sector
-    #             try:
-    #                 cd.date = row['Date']
+    for sector, tickers in sector_tickers.items():
+        print('Downloading data from Yahoo for %s sector' % sector)
+        for each_ticker in tickers:
+            start_day = '0'
+            end_day = '18'
+            start_month = '10'
+            end_month = '1'
+            start_year = '2000'
+            end_year = '2017'
+            url = "http://chart.finance.yahoo.com/table.csv?s=" + \
+                str(each_ticker) + \
+                "&a=" + start_day + "&b=" + start_month + "&c=" + \
+                start_year + "&d=" + end_day + "&e=" + end_month + \
+                "&f=" + end_year + "&g=d&ignore=.csv"
+            s = requests.get(url).content
+            df = pd.read_csv(io.StringIO(s.decode('utf-8')), error_bad_lines=False)
+            for index, row in df.iterrows():
+                cd = ChartData()
+                cd.ticker = each_ticker
+                cd.company_name = ""
+                cd.sector = sector
+                try:
+                    cd.date = row['Date']
 
-    #             except:
-    #                 continue
+                except:
+                    continue
 
-    #             cd.open_value = float(row['Open'])
-    #             cd.close_value = float(row['Close'])
-    #             cd.high_value = float(row['High'])
-    #             cd.low_value = float(row['Low'])
-    #             cd.volume = int(row['Volume'])
-    #             cd.adj_close = float(row['Adj Close'])
+                cd.open_value = float(row['Open'])
+                cd.close_value = float(row['Close'])
+                cd.high_value = float(row['High'])
+                cd.low_value = float(row['Low'])
+                cd.volume = int(row['Volume'])
+                cd.adj_close = float(row['Adj Close'])
 
-    #             cd.save()
+                cd.save()
 
     sec = ['DJI', 'GSPC', 'IXIC']
     for each_sec in sec:

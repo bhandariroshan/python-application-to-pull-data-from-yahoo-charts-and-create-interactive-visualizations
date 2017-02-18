@@ -36,7 +36,7 @@ class ChartDataViewSet(generics.ListAPIView):
         elif time == '10Y':
             filter_number = 365 * 10
         data = ChartData.objects.filter(
-            ticker=ticker,
+            ticker__icontains=ticker,
             date__lte=datetime.datetime.today()
         ).order_by('-date')[0:filter_number]
         print(len(data))
