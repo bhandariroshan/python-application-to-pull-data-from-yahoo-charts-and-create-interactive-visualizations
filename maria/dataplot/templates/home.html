@@ -60,14 +60,13 @@
                 <span style="margin-left:10px;">Add Indicator</span>
               </button>
               <ul class="dropdown-menu" style="width:400px; margin-left:10px;">
-                <li style="height:30px;">
+                <li id="simpleMoving" style="min-height:30px;">
                     <span style="margin-left:10px;">Simple Moving Average (SMA) </span>
                     <span>
                         <a href="#">
-                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                            <i id="addSimpleMoving" class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
                         </a>
                     </span>
-                    
                 </li>
 
                 <li style="height:30px;">
@@ -203,7 +202,7 @@
         </div>
         <div class="col-sm-1">
             <div class="dropdown" style="margin:8px;">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button id="resetBtn" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-refresh" aria-hidden="true"></i>
                 <span style="margin-left:10px;">Reset</span>
               </button>
@@ -225,9 +224,31 @@
 
 {% block javascript %}
 <script type="text/javascript">
+var divCouter = 0;
 
-    function draw_chart(data) {        
+    $('#resetBtn').on('click', function(){
+        window.location.href = '/';
+    });
 
+    function remove_div(divCouter){
+        $('#div'+ divCouter).remove();
+    }
+
+    $("#addSimpleMoving").on('click', function(event){
+        divCouter = divCouter + 1;
+        my_html = '<div id="div' + divCouter + '" style="height: 40px"><div style="margin-left:20px;margin-top: 10px;">'
+             + '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
+             + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
+             + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'
+             + '<span style="float:right; margin-right: 20px;">Period: <input type="text" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + divCouter + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
+             + '</div></div>';
+        $('#simpleMoving').append(my_html);
+        event.stopPropagation();
+        get_data_and_plot('1Y', "", "sma");
+    });
+
+    function draw_chart(data, linedata) {        
+        console.log(linedata);
         new Highcharts.Chart({
             chart: {
                 renderTo: 'container',
@@ -296,44 +317,64 @@
                 type: 'area',
                 name: 'Stock Trading Data',
                 data: data
+            }, {
+                type: 'line',
+                zIndex: 1,
+                marker: {
+                    fillColor: 'red',
+                    lineWidth: 100,
+                    lineColor: 'red'
+                },
+                data: linedata
             }]
         });
     }
 
     $('#btnSearch').on('click', function(){
         var search_text = $('#inpSearch').val();
-        get_data_and_plot('1Y', search_text)
+        get_data_and_plot('1Y', search_text);
     });
 
-    function get_data_and_plot(mytime='1Y', search_text=""){
+    function get_data_and_plot(mytime='1Y', search_text="", urltype=""){
+        var data = [];
+        var linedata = [];
         if (search_text==""){
-            search_text = $('#ddlTicker').val();
-            
+            search_text = $('#ddlTicker').val();            
         }
 
         $('#timeSet').html(mytime);
-
+            
         var url = '/chartdata/' + search_text + '/' + mytime + '/';
-        var data = [];
-
         $.get(url, function(mydata) {
           for (var i=0; i< mydata.length; i++){
             var my_date = mydata[i]['date'].split('-');
 
             data.push({
                 x: Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
-                y:mydata[i]['adj_close'],/*
-                high: mydata[i]['high_value'],
-                low: mydata[i]['low_value'],
-                close: mydata[i]['close_value'],
-                open: mydata[i]['open_value'],
-                ticker: mydata[i]['ticker'],
-                volume: mydata[i]['volume']*/
+                y:mydata[i]['adj_close']
             });
-          }
 
-          draw_chart(data);
-        });
+          }          
+          
+          if(urltype=="sma"){
+            // url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
+            var url = '/chartdata/' + urltype + '/' + search_text + '/' + mytime + '/';
+            $.get(url, function(mydata) {
+              mydata = $.parseJSON(mydata);
+
+              var my_length = Object.keys(mydata['adj_close']).length;
+              for (var i=0; i< my_length; i++){
+                var my_date = mydata['date'][i];
+                linedata.push({
+
+                    x: (new Date(my_date)).toISOString().substring(0, 10),
+                    y:mydata['adj_close'][i]
+                });
+              }
+            });
+           }
+           draw_chart(data, linedata);
+        });        
     }
 
     $('#ddlTicker').on('change', function(){

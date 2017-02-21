@@ -18,7 +18,7 @@ from django.contrib import admin
 from .views import HomeView
 
 from django.conf.urls import include
-from dataplot.views import ChartDataViewSet
+from dataplot.views import ChartDataViewSet, ChartDataMathsViewSet
 
 
 # Wire up our API using automatic URL routing.
@@ -28,5 +28,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^$', HomeView.as_view(), name="home"),
+    url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
+        ChartDataMathsViewSet.as_view()),
     url('^chartdata/(?P<ticker>.+)/(?P<time>.+)$', ChartDataViewSet.as_view()),
 ]
