@@ -76,9 +76,18 @@ class ChartDataMathsViewSet(APIView):
         df = pd.DataFrame(list_data)
         new_df = self.get_rolling_mean(df, 10)
         new_df = new_df.fillna(0)
-        new_df = new_df.to_json()
 
-        return Response(new_df)
+        return_data = []
+        for each_key in new_df['date'].keys():
+            if new_df['adj_close'][each_key] != 0:
+                return_data.append({
+                    'date': new_df['date'][each_key],
+                    'adj_close': new_df['adj_close'][each_key]
+                })
+
+        newlist = sorted(return_data, key=lambda k: k['date'])
+
+        return Response(newlist)
 
 
 class ChartDataViewSet(generics.ListAPIView):
@@ -88,7 +97,6 @@ class ChartDataViewSet(generics.ListAPIView):
 
     def get_queryset(self):
         """Return a list of all the data."""
-        print("GETTTTTTTrrrrrrrrrrrrrrr")
         ticker = self.kwargs['ticker']
         time = self.kwargs['time'].replace('/', '')
 

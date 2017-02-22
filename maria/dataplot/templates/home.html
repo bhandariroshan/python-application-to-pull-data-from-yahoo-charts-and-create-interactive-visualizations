@@ -247,8 +247,9 @@ var divCouter = 0;
         get_data_and_plot('1Y', "", "sma");
     });
 
-    function draw_chart(data, linedata) {        
-        console.log(linedata);
+    function draw_chart(data) {        
+        console.log(data[0]);
+        console.log(data[1]);
         new Highcharts.Chart({
             chart: {
                 renderTo: 'container',
@@ -310,22 +311,24 @@ var divCouter = 0;
                         }
                     },
                     threshold: null
+                },
+                line: {
+                    zIndex: 1,
+                    marker: {
+                        fillColor: 'red',
+                        lineWidth: 1,
+                        lineColor: 'red'
+                    },
                 }
             },
 
             series: [{
                 type: 'area',
                 name: 'Stock Trading Data',
-                data: data
+                data: data[0]
             }, {
-                type: 'line',
-                zIndex: 1,
-                marker: {
-                    fillColor: 'red',
-                    lineWidth: 100,
-                    lineColor: 'red'
-                },
-                data: linedata
+                type: 'area',
+                data: data[1]
             }]
         });
     }
@@ -336,8 +339,6 @@ var divCouter = 0;
     });
 
     function get_data_and_plot(mytime='1Y', search_text="", urltype=""){
-        var data = [];
-        var linedata = [];
         if (search_text==""){
             search_text = $('#ddlTicker').val();            
         }
@@ -346,35 +347,38 @@ var divCouter = 0;
             
         var url = '/chartdata/' + search_text + '/' + mytime + '/';
         $.get(url, function(mydata) {
-          for (var i=0; i< mydata.length; i++){
-            var my_date = mydata[i]['date'].split('-');
+            var returndata = [];
+            var data = [];
+            var linedata = [];
 
-            data.push({
-                x: Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
-                y:mydata[i]['adj_close']
-            });
+            for (var i=0; i< mydata.length; i++){
+                var my_date = mydata[i]['date'].split('-');
+                data.push([
+                    Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                    parseFloat(mydata[i]['adj_close'].toFixed(2))
+                ]);
 
-          }          
-          
-          if(urltype=="sma"){
-            // url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
-            var url = '/chartdata/' + urltype + '/' + search_text + '/' + mytime + '/';
-            $.get(url, function(mydata) {
-              mydata = $.parseJSON(mydata);
+            }
+            
+            if(urltype=="sma"){
+                // url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
+                var url = '/chartdata/' + urltype + '/' + search_text + '/' + mytime + '/';
 
-              var my_length = Object.keys(mydata['adj_close']).length;
-              for (var i=0; i< my_length; i++){
-                var my_date = mydata['date'][i];
-                linedata.push({
-
-                    x: (new Date(my_date)).toISOString().substring(0, 10),
-                    y:mydata['adj_close'][i]
+                $.get(url, function(newdata) {
+                  for (var j=0; j< 50; j++){
+                    var new_date = newdata[j]['date'].split('-');
+                    linedata.push([
+                        Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
+                        parseFloat(newdata[j]['adj_close'].toFixed(2))
+                    ]);
+                  }
                 });
-              }
-            });
-           }
-           draw_chart(data, linedata);
-        });        
+            }
+            returndata.push(data);
+            returndata.push(linedata);
+            draw_chart(returndata);
+
+        });
     }
 
     $('#ddlTicker').on('change', function(){
