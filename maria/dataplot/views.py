@@ -10,7 +10,7 @@ from rest_framework.views import Response
 from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
 
-import datetime
+# import datetime
 
 
 class ChartDataMathsViewSet(APIView):
@@ -37,6 +37,7 @@ class ChartDataMathsViewSet(APIView):
         """Return Question Stats."""
         ticker = self.kwargs['ticker']
         time = self.kwargs['time'].replace('/', '')
+        chart_type = self.kwargs['chart_type'].replace('/', '')
 
         filter_number = 365
         if time == '1m':
@@ -57,37 +58,69 @@ class ChartDataMathsViewSet(APIView):
             filter_number = 365 * 10
 
         data = ChartData.objects.filter(
-            ticker__icontains=ticker,
-            date__lte=datetime.datetime.today()
+            ticker__icontains=ticker
         ).order_by('-date')[0:filter_number]
 
         list_data = []
         for each_data in data:
             list_data.append({
                 'date': each_data.date,
-                'open_value': each_data.open_value,
-                'close_value': each_data.close_value,
-                'high_value': each_data.high_value,
-                'low_value': each_data.low_value,
+                # 'open_value': each_data.open_value,
+                # 'close_value': each_data.close_value,
+                # 'high_value': each_data.high_value,
+                # 'low_value': each_data.low_value,
                 'ticker': each_data.ticker,
                 'adj_close': each_data.adj_close,
             })
 
+        list_data = sorted(list_data, key=lambda k: k['date'])
         df = pd.DataFrame(list_data)
-        new_df = self.get_rolling_mean(df, 10)
-        new_df = new_df.fillna(0)
+        df = df.set_index("date")
+        df.fillna(method="ffill", inplace="True")
+        df.fillna(method="bfill", inplace="True")
 
-        return_data = []
-        for each_key in new_df['date'].keys():
-            if new_df['adj_close'][each_key] != 0:
-                return_data.append({
-                    'date': new_df['date'][each_key],
-                    'adj_close': new_df['adj_close'][each_key]
-                })
+        if chart_type == 'sma':
+            roling_mean_df = self.get_rolling_mean(df['adj_close'], 10)
+            roling_sd_df = self.get_rolling_std(df['adj_close'], 10)
+            roling_mean_df = roling_mean_df.dropna()
+            roling_mean_df.rename('adj_close')
+            data = roling_mean_df.to_dict()
+            return_data = [
+                {'date': d.strftime("%Y-%m-%d"), 'adj_close': v}
+                for d, v in data.items()
+            ]
+            newlist = sorted(return_data, key=lambda k: k['date'])
+            return Response(newlist)
 
-        newlist = sorted(return_data, key=lambda k: k['date'])
+        elif chart_type == "bollinger":
+            roling_mean_df = self.get_rolling_mean(df['adj_close'], 10)
+            roling_sd_df = self.get_rolling_std(df['adj_close'], 10)
+            bollinger_band_upper_df, bollinger_band_lower_df = self.get_bollinger_bands(
+                roling_mean_df, roling_sd_df
+            )
 
-        return Response(newlist)
+            bollinger_band_upper_df = roling_mean_df.dropna()
+            bollinger_band_upper_df.rename('adj_close')
+            bfu_data = bollinger_band_upper_df.to_dict()
+
+            bollinger_band_lower_df = bollinger_band_lower_df.dropna()
+            bollinger_band_lower_df.rename('adj_close')
+            bfl_data = bollinger_band_lower_df.to_dict()
+
+            b_upper = [
+                {'date': d.strftime("%Y-%m-%d"), 'adj_close': v}
+                for d, v in bfu_data.items()
+            ]
+
+            b_lower = [
+                {'date': d.strftime("%Y-%m-%d"), 'adj_close': v}
+                for d, v in bfl_data.items()
+            ]
+
+            b_upper_sorted = sorted(b_upper, key=lambda k: k['date'])
+            b_lower_sorted = sorted(b_lower, key=lambda k: k['date'])
+
+            return Response({'upper': b_upper_sorted, 'lower': b_lower_sorted})
 
 
 class ChartDataViewSet(generics.ListAPIView):
@@ -118,7 +151,6 @@ class ChartDataViewSet(generics.ListAPIView):
         elif time == '10Y':
             filter_number = 365 * 10
         data = ChartData.objects.filter(
-            ticker__icontains=ticker,
-            date__lte=datetime.datetime.today()
+            ticker__icontains=ticker
         ).order_by('-date')[0:filter_number]
         return data

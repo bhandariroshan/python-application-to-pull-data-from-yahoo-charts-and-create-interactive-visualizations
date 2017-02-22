@@ -108,11 +108,11 @@
                     </span>
                     
                 </li>
-                <li style="height:30px;">
+                <li id="bollingerLi" style="min-height:30px;">
                     <span style="margin-left:10px;">Bollinger Band(BB) </span>
                     <span>
                         <a href="#">
-                            <i class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
+                            <i id="addBollinger" class="fa fa-plus" aria-hidden="true" style="float:right; margin-right: 30px;"></i>
                         </a>
                     </span>
                     
@@ -225,112 +225,144 @@
 {% block javascript %}
 <script type="text/javascript">
 var divCouter = 0;
+var bollingerCount = 0;
 
-    $('#resetBtn').on('click', function(){
-        window.location.href = '/';
-    });
+$('#resetBtn').on('click', function(){
+    window.location.href = '/';
+});
 
-    function remove_div(divCouter){
-        $('#div'+ divCouter).remove();
-    }
+function remove_div(divCouter){
+    $('#div'+ divCouter).remove();
+}
 
-    $("#addSimpleMoving").on('click', function(event){
-        divCouter = divCouter + 1;
-        my_html = '<div id="div' + divCouter + '" style="height: 40px"><div style="margin-left:20px;margin-top: 10px;">'
-             + '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
-             + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
-             + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'
-             + '<span style="float:right; margin-right: 20px;">Period: <input type="text" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + divCouter + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
-             + '</div></div>';
-        $('#simpleMoving').append(my_html);
-        event.stopPropagation();
-        get_data_and_plot('1Y', "", "sma");
-    });
+$("#addBollinger").on('click', function(event){
+    bollingerCount = bollingerCount + 1;
+    my_html = '<div id="div' + bollingerCount + '" style="height: 40px"><div style="margin-left:20px;margin-top: 10px;">'
+         + '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
+         + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
+         + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'
+         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + bollingerCount + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
+         + '</div></div>';
+    $('#bollingerLi').append(my_html);
+    event.stopPropagation();
+    get_data_and_plot('1Y', "", "bollinger");
+});
 
-    function draw_chart(data) {        
-        console.log(data[0]);
-        console.log(data[1]);
+$("#addSimpleMoving").on('click', function(event){
+    divCouter = divCouter + 1;
+    my_html = '<div id="div' + divCouter + '" style="height: 40px"><div style="margin-left:20px;margin-top: 10px;">'
+         + '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
+         + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
+         + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'
+         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + divCouter + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
+         + '</div></div>';
+    $('#simpleMoving').append(my_html);
+    event.stopPropagation();
+    get_data_and_plot('1Y', "", "sma");
+});
+
+function draw_chart(data) {        
         new Highcharts.Chart({
-            chart: {
-                renderTo: 'container',
-                /*zoomType: 'x'*/
+        chart: {
+            renderTo: 'container',
+            /*zoomType: 'x'*/
 
-            },
-            /*tooltip: {
-                formatter: function () {
-                    return  'Open: <b>' + this.point.open + '</b><br/>' + 
-                            'Close: <b>' + this.point.close + '</b><br/>' + 
-                            'High: <b>' + this.point.high + '</b><br/>' +
-                            'Low: <b>' + this.point.low + '</b><br/>' +
-                            'Volume: <b>' + this.point.volume + '</b><br/>';
-                }
-            },*/
+        },
+        /*tooltip: {
+            formatter: function () {
+                return  'Open: <b>' + this.point.open + '</b><br/>' + 
+                        'Close: <b>' + this.point.close + '</b><br/>' + 
+                        'High: <b>' + this.point.high + '</b><br/>' +
+                        'Low: <b>' + this.point.low + '</b><br/>' +
+                        'Volume: <b>' + this.point.volume + '</b><br/>';
+            }
+        },*/
+        title: {
+            text: 'Stock Exchange Trading Data'
+        },
+        /*subtitle: {
+            text: document.ontouchstart === undefined ?
+                    'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+        },*/
+        xAxis: {
+            type: 'datetime'
+        },
+        yAxis: {
             title: {
-                text: 'Stock Exchange Trading Data'
+                text: 'Trading Close Value'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        plotOptions: {
+            series:{
+                turboThreshold:5000//set it to a larger threshold, it is by default to 1000
             },
-            /*subtitle: {
-                text: document.ontouchstart === undefined ?
-                        'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-            },*/
-            xAxis: {
-                type: 'datetime'
-            },
-            yAxis: {
-                title: {
-                    text: 'Trading Close Value'
-                }
-            },
-            legend: {
-                enabled: false
-            },
-            plotOptions: {
-                series:{
-                    turboThreshold:5000//set it to a larger threshold, it is by default to 1000
+            area: {
+                cropThreshold: 5,
+                fillColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops: [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
                 },
-                area: {
-                    cropThreshold: 5,
-                    fillColor: {
-                        linearGradient: {
-                            x1: 0,
-                            y1: 0,
-                            x2: 0,
-                            y2: 1
-                        },
-                        stops: [
-                            [0, Highcharts.getOptions().colors[0]],
-                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                        ]
-                    },
-                    marker: {
-                        radius: 2
-                    },
-                    lineWidth: 1,
-                    states: {
-                        hover: {
-                            lineWidth: 1
-                        }
-                    },
-                    threshold: null
+                marker: {
+                    radius: 2
                 },
-                line: {
-                    zIndex: 1,
-                    marker: {
-                        fillColor: 'red',
-                        lineWidth: 1,
-                        lineColor: 'red'
-                    },
-                }
+                lineWidth: 1,
+                states: {
+                    hover: {
+                        lineWidth: 1
+                    }
+                },
+                threshold: null
             },
+            line: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+            ,
+        },
 
-            series: [{
+
+        series: [
+            {
                 type: 'area',
                 name: 'Stock Trading Data',
                 data: data[0]
-            }, {
-                type: 'area',
+            },
+            {
+                type: 'line',
+                zIndex: 1,
+                marker: {
+                    fillColor: 'black',
+                    lineWidth: 2,
+                    lineColor: 'white'
+                },
                 data: data[1]
-            }]
-        });
+            },
+            {
+                type: 'line',
+                zIndex: 1,
+                marker: {
+                    fillColor: 'brown',
+                    lineWidth: 2,
+                    lineColor: 'yelow'
+                },
+                data: data[2]
+            }
+        ]
+
+    });
+
     }
 
     $('#btnSearch').on('click', function(){
@@ -360,24 +392,63 @@ var divCouter = 0;
 
             }
             
-            if(urltype=="sma"){
+            if(urltype!=""){
                 // url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
                 var url = '/chartdata/' + urltype + '/' + search_text + '/' + mytime + '/';
 
                 $.get(url, function(newdata) {
-                  for (var j=0; j< 50; j++){
-                    var new_date = newdata[j]['date'].split('-');
-                    linedata.push([
-                        Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
-                        parseFloat(newdata[j]['adj_close'].toFixed(2))
-                    ]);
+                  if(urltype=="bollinger"){
+                    var upper_data = [];
+                    var lower_data = [];
+
+                    for (var j=0; j < newdata['upper'].length; j++){
+                        
+                        var new_date = newdata['lower'][j]['date'].split('-');
+                        upper_data.push([
+                            Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
+                            parseFloat(newdata['upper'][j]['adj_close'].toFixed(2))
+                        ]);
+                    }
+
+                    for (var j=0; j < newdata['lower'].length; j++){
+                        var new_date = newdata['lower'][j]['date'].split('-');
+                        lower_data.push([
+                            Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
+                            parseFloat(newdata['lower'][j]['adj_close'].toFixed(2))
+                        ]);
+
+                    }
+
+                      returndata[0] = data;
+                      returndata[1] = upper_data;
+                      returndata[2] = lower_data;
+
+                      draw_chart(returndata);
                   }
+
+                  else if(urltype=="sma"){
+                      for (var j=0; j < newdata.length; j++){
+                        var new_date = newdata[j]['date'].split('-');
+                        linedata.push([
+                            Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
+                            parseFloat(newdata[j]['adj_close'].toFixed(2))
+                        ]);
+                      }
+
+                      returndata[0] = data;
+                      returndata[1] = linedata;
+                      returndata[2] = [];
+                      draw_chart(returndata);
+                  }
+
                 });
             }
-            returndata.push(data);
-            returndata.push(linedata);
-            draw_chart(returndata);
-
+            else{
+                returndata[0] = data;
+                returndata[1] = [];
+                returndata[2] = [];
+                draw_chart(returndata);
+            }
         });
     }
 
