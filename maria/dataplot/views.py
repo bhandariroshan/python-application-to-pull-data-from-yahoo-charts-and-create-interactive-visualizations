@@ -123,6 +123,55 @@ class ChartDataMathsViewSet(APIView):
             return Response({'upper': b_upper_sorted, 'lower': b_lower_sorted})
 
 
+class ChartMultiTickerViewSet(APIView):
+    """docstring for ChartMultiTickerViewSet"""
+    serializer_class = ChartDataSerializer
+
+    def get(self, request):
+        """Return a list of all the data."""
+        tickers = self.request.GET['tickers'].split(',')
+        time = self.request.GET['time'].replace('/', '')
+        tickers = [item.lower() for item in tickers]
+        filter_number = 365
+        if time == '1m':
+            filter_number = 30
+        elif time == '2m':
+            filter_number = 60
+        elif time == '3m':
+            filter_number = 90
+        elif time == '6m':
+            filter_number = 180
+        elif time == '1Y':
+            filter_number = 365
+        elif time == '2Y':
+            filter_number = 365 * 2
+        elif time == '5Y':
+            filter_number = 365 * 5
+        elif time == '10Y':
+            filter_number = 365 * 10
+
+        returndata = {}
+        for each_ticker in tickers:
+            data = ChartData.objects.filter(
+                ticker__icontains=each_ticker
+            ).order_by('-date')
+
+            for each_data in data:
+                    if each_data.ticker in returndata.keys():
+                        if len(returndata[each_data.ticker]) < filter_number:
+                            returndata[each_data.ticker].append({
+                                'adj_close': each_data.adj_close,
+                                'date': str(each_data.date)
+                            })
+                    else:
+                        returndata[each_data.ticker] = [{
+                            'adj_close': each_data.adj_close,
+                            'date': str(each_data.date)
+                        }]
+
+        return Response(returndata)
+
+
 class ChartDataViewSet(generics.ListAPIView):
     """Chart Data view set."""
 

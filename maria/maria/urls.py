@@ -18,7 +18,7 @@ from django.contrib import admin
 from .views import HomeView
 
 from django.conf.urls import include
-from dataplot.views import ChartDataViewSet, ChartDataMathsViewSet
+from dataplot.views import ChartDataViewSet, ChartDataMathsViewSet, ChartMultiTickerViewSet
 
 
 # Wire up our API using automatic URL routing.
@@ -26,9 +26,15 @@ from dataplot.views import ChartDataViewSet, ChartDataMathsViewSet
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-auth/', include(
+        'rest_framework.urls',
+        namespace='rest_framework')),
     url(r'^$', HomeView.as_view(), name="home"),
+    url(r'^chartdata/multiticker/',
+        ChartMultiTickerViewSet.as_view(),
+        name="multiticker"),
     url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
         ChartDataMathsViewSet.as_view()),
     url('^chartdata/(?P<ticker>.+)/(?P<time>.+)$', ChartDataViewSet.as_view()),
+
 ]

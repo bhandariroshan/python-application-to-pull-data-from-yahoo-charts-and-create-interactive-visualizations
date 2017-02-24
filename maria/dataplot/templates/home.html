@@ -19,6 +19,8 @@
     <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/fontawesomemin.css' %}"> -->
     
     <link rel="stylesheet" href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css">    
+    <link rel="stylesheet" href="http://davidstutz.github.io/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">    
+
 </head>
 
 <body>
@@ -131,35 +133,15 @@
               </ul>
             </div>
         </div>
-        <div class="col-sm-1">
-            <div class="dropdown" style="margin:8px;">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-                <span style="margin-left:10px;">Compare</span>
-              </button>
-              <ul class="dropdown-menu">
-                <li style="height: 100px; width: 375px;">
-                    <input type="text" id="compTicker" name="" placeholder="ticker" style="width:70%;margin: 10px;">
-                    <button id="compareBtn">compare</button>
-                    <div id="compareDiv" class="row" style="margin: 10px;">
-                    <!--  <span class="col-sm-4">
-                            <i class="fa fa-plus" aria-hidden="true"></i>
-                            <span style="margin-left: 10px;">DOW</span>
-                        </span>
-                        <span class="col-sm-4">
-                            <i class="fa fa-plus" aria-hidden="true"></i>
-                            <span style="margin-left: 10px;">NASDAQ</span>
-                        </span>
-                        <span class="col-sm-4">
-                            <i class="fa fa-plus" aria-hidden="true"></i>
-                            <span style="margin-left: 10px;">S&P500</span>
-                        </span> -->
-                    </div>
-                </li>
-              </ul>
-            </div>
+        <div class="col-sm-1" style="margin-top:8px;">
+            <!-- Build your select: -->
+            <select  id="example-getting-started" multiple="multiple">
+                {% for each_ticker in tickers %}
+                    <option value="{{each_ticker}}">{{each_ticker}}</option>
+                {% endfor %}
+            </select>
         </div>
-        <div class="col-sm-1">
+        <div class="col-sm-1" style="margin-left:30px;">
             <div class="dropdown" style="margin:8px;">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-sort-desc" aria-hidden="true"></i>
@@ -270,7 +252,7 @@ $('#compareBtn').on('click', function(){
 });
 
 function draw_chart(data) {        
-        new Highcharts.Chart({
+        var chart = new Highcharts.Chart({
         chart: {
             renderTo: 'container',
             /*zoomType: 'x'*/
@@ -336,40 +318,27 @@ function draw_chart(data) {
                 dataLabels: {
                     enabled: true
                 }
-            }
-            ,
-        },
-
-
-        series: [
-            {
-                type: 'area',
-                name: 'Stock Trading Data',
-                data: data[0]
             },
-            {
-                type: 'line',
-                zIndex: 1,
-                marker: {
-                    fillColor: 'black',
-                    lineWidth: 2,
-                    lineColor: 'white'
-                },
-                data: data[1]
-            },
-            {
-                type: 'line',
-                zIndex: 1,
-                marker: {
-                    fillColor: 'brown',
-                    lineWidth: 2,
-                    lineColor: 'yelow'
-                },
-                data: data[2]
-            }
-        ]
-
+        }
     });
+
+    chart.addSeries({
+            type: 'area',
+            name: 'Stock Trading Data',
+            data: data[0]
+        }, true);
+
+        for (i=1; i<data.length; i++){
+            chart.addSeries({
+                    type: 'line',
+                    zIndex: 1,
+                    marker: {
+
+                        lineWidth: 2,
+                    },
+                    data: data[i]
+                },true);
+        }
 
     }
 
@@ -380,31 +349,35 @@ function draw_chart(data) {
 
 returndata = [];
 
-flag = false;
-counter=0;
-
 function get_compare(mytime='1Y', comp=[]){
     returndata = [];
 
+        var url = '/chartdata/multiticker/';
         $('#timeSet').html(mytime);
-        for (i=0; i < comp.length; i++){
-            var url = '/chartdata/' + comp[i] + '/' + mytime + '/';
-            var data = [];
-            $.get(url, function(mydata) {
-
-                for (var i=0; i< mydata.length; i++){
-                    var my_date = mydata[i]['date'].split('-');
-                    data.push([
-                        Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
-                        parseFloat(mydata[i]['adj_close'].toFixed(2))
-                    ]);
+        $.ajax({
+          url: url,
+          type: "get", //send it through get method
+          data: { 
+            'tickers': comp.toString(), 
+            'time': mytime, 
+          },
+          success: function(mydata) {
+            //Do Something
+            for (var i=0; i < comp.length; i++){
+                var data = [];
+                for (var j=0; j < mydata[comp[i]].length; j++){
+                        var my_date = mydata[comp[i]][j]['date'].split('-');
+                        data.push([
+                            Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                            parseFloat(mydata[comp[i]][j]['adj_close'].toFixed(2))
+                        ]);
 
                 }
-
                 returndata.push(data);
-            });
-        }
-        draw_chart(returndata);
+            }
+            draw_chart(returndata);
+          }
+        });
 }
 
     function get_data_and_plot(mytime='1Y', search_text="", urltype=""){
@@ -499,6 +472,31 @@ function get_compare(mytime='1Y', comp=[]){
 
 </script>
 
+<script type="text/javascript" src="http://davidstutz.github.io/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+
+<!-- Initialize the plugin: -->
+<script type="text/javascript">
+    var my_tickers = [];
+    $(document).ready(function() {
+        $('#example-getting-started').multiselect({
+            onChange: function(option, checked) {
+                console.log(checked);
+                var index = my_tickers.indexOf(option[0].value);
+                if (index > -1 && checked == false) {
+                   my_tickers.splice(index, 1);
+                }
+                else{
+                    my_tickers.push(option[0].value);
+                }
+            },
+            onDropdownHide: function(event) {
+                // alert('onDropdownHide!');
+                // call api for data
+                get_compare('1Y', my_tickers);
+            }
+        });
+    });
+</script>
 {% endblock javascript %}
 
 </body>
