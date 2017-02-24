@@ -31,7 +31,7 @@ APPS_DIR = ROOT_DIR.path('maria')
 
 ALLOWED_HOSTS = ['*']
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
-APPS_DIR = ROOT_DIR.path('maria/dataplot')
+APPS_DIR = ROOT_DIR.path('dataplot')
 
 # Application definition
 
@@ -161,6 +161,8 @@ STATICFILES_DIRS = (
 )
 
 
+print(APPS_DIR)
+print(STATICFILES_DIRS)
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
