@@ -1,6 +1,7 @@
 # Demo Project to use High Chart using Python and Django Application
 
 1. Automatic download data from Yahoo finance excel data (daily at a certain time) for SP500 stocks. For example, download AAPL data from 
+
 http://chart.finance.yahoo.com/table.csv?s=AAPL&a=0&b=13&c=2017&d=1&e=13&f=2017&g=d&ignore=.csv
 
 2. Load data, cleansing data, Plot the interactive chart using Python, Store the data in MySQL

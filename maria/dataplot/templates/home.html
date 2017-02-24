@@ -137,9 +137,10 @@
               </button>
               <ul class="dropdown-menu">
                 <li style="height: 100px; width: 375px;">
-                    <input type="text" name="" style="width:90%;margin: 10px;">
-                    <div class="row" style="margin: 10px;">
-                        <span class="col-sm-4">
+                    <input type="text" id="compTicker" name="" placeholder="ticker" style="width:70%;margin: 10px;">
+                    <button id="compareBtn">compare</button>
+                    <div id="compareDiv" class="row" style="margin: 10px;">
+                    <!--  <span class="col-sm-4">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                             <span style="margin-left: 10px;">DOW</span>
                         </span>
@@ -150,7 +151,7 @@
                         <span class="col-sm-4">
                             <i class="fa fa-plus" aria-hidden="true"></i>
                             <span style="margin-left: 10px;">S&P500</span>
-                        </span>
+                        </span> -->
                     </div>
                 </li>
               </ul>
@@ -261,6 +262,11 @@ $("#addSimpleMoving").on('click', function(event){
     get_data_and_plot('1Y', "", "sma");
 });
 
+$('#compareBtn').on('click', function(){
+    var compare = [$('#ddlTicker').val(), $('#compTicker').val()];
+    get_compare('1Y', compare);
+});
+
 function draw_chart(data) {        
         new Highcharts.Chart({
         chart: {
@@ -369,6 +375,32 @@ function draw_chart(data) {
         var search_text = $('#inpSearch').val();
         get_data_and_plot('1Y', search_text);
     });
+
+returndata = [];
+
+function get_compare(mytime='1Y', comp=[]){
+    returndata = [];
+
+        $('#timeSet').html(mytime);
+        for (i=0; i < comp.length; i++){
+            var url = '/chartdata/' + comp[i] + '/' + mytime + '/';
+            var data = [];
+            $.get(url, function(mydata) {
+
+                for (var i=0; i< mydata.length; i++){
+                    var my_date = mydata[i]['date'].split('-');
+                    data.push([
+                        Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                        parseFloat(mydata[i]['adj_close'].toFixed(2))
+                    ]);
+
+                }
+
+                returndata.push(data);
+            });
+        }
+        draw_chart(returndata);
+}
 
     function get_data_and_plot(mytime='1Y', search_text="", urltype=""){
         if (search_text==""){
