@@ -31,7 +31,7 @@ APPS_DIR = ROOT_DIR.path('maria')
 
 ALLOWED_HOSTS = ['*']
 ROOT_DIR = environ.Path(__file__) - 3  # (/a/b/myfile.py - 3 = /)
-APPS_DIR = ROOT_DIR.path('dataplot')
+APPS_DIR = ROOT_DIR.path('maria/dataplot')
 
 # Application definition
 
