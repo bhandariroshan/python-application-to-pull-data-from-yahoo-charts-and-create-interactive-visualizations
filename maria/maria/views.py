@@ -17,7 +17,7 @@ class HomeView(TemplateView):
         selected_ticker = 'IVZ'
         tickers = []
         for each_t in t:
-            if each_t['ticker'] !="":
+            if len(each_t['ticker']) <= 1:
                 tickers.append(each_t['ticker'])
 
         tickers = sorted(tickers)
