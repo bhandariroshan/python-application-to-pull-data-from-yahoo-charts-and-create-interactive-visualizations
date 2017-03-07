@@ -104,7 +104,7 @@ DATABASES = {
         'NAME': 'mariadb',
         'HOST': 'localhost',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'postgrs',
+        'USER': 'postgres',
         'PASSWORD': 'postgres',
         'PORT': 5432
     }
@@ -161,8 +161,6 @@ STATICFILES_DIRS = (
 )
 
 
-print(APPS_DIR)
-print(STATICFILES_DIRS)
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',

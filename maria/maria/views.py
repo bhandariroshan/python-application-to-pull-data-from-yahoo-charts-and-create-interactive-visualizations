@@ -17,8 +17,10 @@ class HomeView(TemplateView):
         selected_ticker = 'IVZ'
         tickers = []
         for each_t in t:
-            tickers.append(each_t['ticker'])
+            if each_t['ticker'] !="":
+                tickers.append(each_t['ticker'])
 
+        tickers = sorted(tickers)
         return render(
             request,
             self.template_name,

@@ -205,12 +205,14 @@
 
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
-
+<script type="text/javascript" src="http://davidstutz.github.io/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
 
 {% block javascript %}
 <script type="text/javascript">
 var divCouter = 0;
 var bollingerCount = 0;
+selected_time = '1Y';
+search_text = '';
 
 $('#resetBtn').on('click', function(){
     window.location.href = '/';
@@ -230,7 +232,7 @@ $("#addBollinger").on('click', function(event){
          + '</div></div>';
     $('#bollingerLi').append(my_html);
     event.stopPropagation();
-    get_data_and_plot('1Y', "", "bollinger");
+    get_data_and_plot(selected_time, "", "bollinger");
 });
 
 $("#addSimpleMoving").on('click', function(event){
@@ -243,12 +245,19 @@ $("#addSimpleMoving").on('click', function(event){
          + '</div></div>';
     $('#simpleMoving').append(my_html);
     event.stopPropagation();
-    get_data_and_plot('1Y', "", "sma");
+    get_data_and_plot(selected_time, "", "sma");
 });
 
 $('#compareBtn').on('click', function(){
-    var compare = [$('#ddlTicker').val(), $('#compTicker').val()];
-    get_compare('1Y', compare);
+    myticker = $('#ddlTicker').val();
+    search_ticker = $('#inpSearch').val();
+    if (search_ticker){
+        var compare = [search_ticker, $('#compTicker').val()];
+    }
+    else{
+        var compare = [myticker, $('#compTicker').val()];   
+    }
+    get_compare(selected_time, compare);
 });
 
 function draw_chart(data) {        
@@ -343,8 +352,8 @@ function draw_chart(data) {
     }
 
     $('#btnSearch').on('click', function(){
-        var search_text = $('#inpSearch').val();
-        get_data_and_plot('1Y', search_text);
+        search_text = $('#inpSearch').val();
+        get_data_and_plot(selected_time, search_text);
     });
 
 returndata = [];
@@ -380,12 +389,15 @@ function get_compare(mytime='1Y', comp=[]){
         });
 }
 
-    function get_data_and_plot(mytime='1Y', search_text="", urltype=""){
-        if (search_text==""){
-            search_text = $('#ddlTicker').val();            
+function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
+        if (searchtext==""){            
+            if (search_text==""){
+                search_text = $('#ddlTicker').val();
+            }
         }
 
-        $('#timeSet').html(mytime);
+        selected_time = mytime;
+        $('#timeSet').html(selected_time);
             
         var url = '/chartdata/' + search_text + '/' + mytime + '/';
         $.get(url, function(mydata) {
@@ -463,6 +475,8 @@ function get_compare(mytime='1Y', comp=[]){
     }
 
     $('#ddlTicker').on('change', function(){
+        search_text = $('#ddlTicker').val();
+        $('#inpSearch').val(search_text);
         get_data_and_plot();
     });
 
@@ -470,12 +484,7 @@ function get_compare(mytime='1Y', comp=[]){
         get_data_and_plot();
     });
 
-</script>
 
-<script type="text/javascript" src="http://davidstutz.github.io/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
-
-<!-- Initialize the plugin: -->
-<script type="text/javascript">
     var my_tickers = [];
     $(document).ready(function() {
         $('#example-getting-started').multiselect({
@@ -492,7 +501,7 @@ function get_compare(mytime='1Y', comp=[]){
             onDropdownHide: function(event) {
                 // alert('onDropdownHide!');
                 // call api for data
-                get_compare('1Y', my_tickers);
+                get_compare(selected_time, my_tickers);
             }
         });
     });
