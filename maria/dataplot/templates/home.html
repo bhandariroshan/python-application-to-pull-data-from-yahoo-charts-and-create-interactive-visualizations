@@ -485,8 +485,8 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
     });
 
 
-    var my_tickers = [];
     $(document).ready(function() {
+        var my_tickers = [$('#inpSearch').val()];
         $('#example-getting-started').multiselect({
             onChange: function(option, checked) {
                 console.log(checked);
