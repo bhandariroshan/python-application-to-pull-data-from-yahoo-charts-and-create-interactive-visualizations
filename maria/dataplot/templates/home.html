@@ -486,7 +486,14 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
 
 
     $(document).ready(function() {
-        var my_tickers = [$('#inpSearch').val()];
+        var newsearch = $('#inpSearch').val();
+
+        if (newsearch.length <= 0){
+            newsearch = $('#ddlTicker').val();
+        }
+
+        var my_tickers = [newsearch];
+
         $('#example-getting-started').multiselect({
             onChange: function(option, checked) {
                 console.log(checked);
