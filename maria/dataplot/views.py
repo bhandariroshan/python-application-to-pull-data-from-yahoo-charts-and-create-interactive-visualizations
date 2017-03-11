@@ -56,6 +56,8 @@ class ChartDataMathsViewSet(APIView):
             filter_number = 365 * 5
         elif time == '10Y':
             filter_number = 365 * 10
+        elif time == 'max':
+            filter_number = 365 * 30
 
         data = ChartData.objects.filter(
             ticker__icontains=ticker
@@ -149,6 +151,8 @@ class ChartMultiTickerViewSet(APIView):
             filter_number = 365 * 5
         elif time == '10Y':
             filter_number = 365 * 10
+        elif time == 'max':
+            filter_number = 365 * 30
 
         returndata = {}
         for each_ticker in tickers:
@@ -157,17 +161,17 @@ class ChartMultiTickerViewSet(APIView):
             ).order_by('-date')
 
             for each_data in data:
-                    if each_data.ticker in returndata.keys():
-                        if len(returndata[each_data.ticker]) < filter_number:
-                            returndata[each_data.ticker].append({
-                                'adj_close': each_data.adj_close,
-                                'date': str(each_data.date)
-                            })
-                    else:
-                        returndata[each_data.ticker] = [{
+                if each_data.ticker in returndata.keys():
+                    if len(returndata[each_data.ticker]) < filter_number:
+                        returndata[each_data.ticker].append({
                             'adj_close': each_data.adj_close,
                             'date': str(each_data.date)
-                        }]
+                        })
+                else:
+                    returndata[each_data.ticker] = [{
+                        'adj_close': each_data.adj_close,
+                        'date': str(each_data.date)
+                    }]
 
         return Response(returndata)
 
@@ -199,6 +203,8 @@ class ChartDataViewSet(generics.ListAPIView):
             filter_number = 365 * 5
         elif time == '10Y':
             filter_number = 365 * 10
+        elif time == 'max':
+            filter_number = 365 * 30
         data = ChartData.objects.filter(
             ticker__icontains=ticker
         ).order_by('-date')[0:filter_number]

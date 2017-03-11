@@ -135,7 +135,7 @@
         </div>
         <div class="col-sm-1" style="margin-top:8px;">
             <!-- Build your select: -->
-            <select  id="example-getting-started" multiple="multiple">
+            <select  id="example-getting-started" multiple="multiple" style="max-height: 300px; overflow: overlay;">
                 {% for each_ticker in tickers %}
                     <option value="{{each_ticker}}">{{each_ticker}}</option>
                 {% endfor %}
@@ -213,6 +213,11 @@ var divCouter = 0;
 var bollingerCount = 0;
 selected_time = '1Y';
 search_text = '';
+my_tickers = [];
+
+$('#inpSearch').on('change', function(){
+    my_tickers = [$('#inpSearch').val()].concat($('#example-getting-started').val());
+});
 
 $('#resetBtn').on('click', function(){
     window.location.href = '/';
@@ -225,10 +230,10 @@ function remove_div(divCouter){
 $("#addBollinger").on('click', function(event){
     bollingerCount = bollingerCount + 1;
     my_html = '<div id="div' + bollingerCount + '" style="height: 40px"><div style="margin-left:20px;margin-top: 10px;">'
-         + '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
+         /*+ '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
          + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
-         + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'
-         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + bollingerCount + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
+         + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'*/
+         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" disabled="disabled" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + bollingerCount + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
          + '</div></div>';
     $('#bollingerLi').append(my_html);
     event.stopPropagation();
@@ -238,10 +243,10 @@ $("#addBollinger").on('click', function(event){
 $("#addSimpleMoving").on('click', function(event){
     divCouter = divCouter + 1;
     my_html = '<div id="div' + divCouter + '" style="height: 40px"><div style="margin-left:20px;margin-top: 10px;">'
-         + '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
+         /*+ '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
          + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
-         + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'
-         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + divCouter + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
+         + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'*/
+         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" disabled="disabled" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + divCouter + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
          + '</div></div>';
     $('#simpleMoving').append(my_html);
     event.stopPropagation();
@@ -251,7 +256,10 @@ $("#addSimpleMoving").on('click', function(event){
 $('#compareBtn').on('click', function(){
     myticker = $('#ddlTicker').val();
     search_ticker = $('#inpSearch').val();
-    if (search_ticker){
+    console.log(search_ticker);
+    console.log(myticker);
+
+    if (search_ticker.length > 0){
         var compare = [search_ticker, $('#compTicker').val()];
     }
     else{
@@ -260,7 +268,7 @@ $('#compareBtn').on('click', function(){
     get_compare(selected_time, compare);
 });
 
-function draw_chart(data) {        
+function draw_chart(data=[], labeldata=[]) {        
         var chart = new Highcharts.Chart({
         chart: {
             renderTo: 'container',
@@ -277,7 +285,7 @@ function draw_chart(data) {
             }
         },*/
         title: {
-            text: 'Stock Exchange Trading Data'
+            text: 'Stock Trading data'
         },
         /*subtitle: {
             text: document.ontouchstart === undefined ?
@@ -333,13 +341,14 @@ function draw_chart(data) {
 
     chart.addSeries({
             type: 'area',
-            name: 'Stock Trading Data',
+            name: labeldata[0],
             data: data[0]
         }, true);
 
         for (i=1; i<data.length; i++){
             chart.addSeries({
                     type: 'line',
+                    name: labeldata[i],
                     zIndex: 1,
                     marker: {
 
@@ -359,7 +368,7 @@ function draw_chart(data) {
 returndata = [];
 
 function get_compare(mytime='1Y', comp=[]){
-    returndata = [];
+        returndata = [];
 
         var url = '/chartdata/multiticker/';
         $('#timeSet').html(mytime);
@@ -374,17 +383,17 @@ function get_compare(mytime='1Y', comp=[]){
             //Do Something
             for (var i=0; i < comp.length; i++){
                 var data = [];
-                for (var j=0; j < mydata[comp[i]].length; j++){
-                        var my_date = mydata[comp[i]][j]['date'].split('-');
-                        data.push([
-                            Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
-                            parseFloat(mydata[comp[i]][j]['adj_close'].toFixed(2))
-                        ]);
-
+                var mykey = comp[i].toUpperCase();
+                for (var j=0; j < mydata[mykey].length; j++){
+                    var my_date = mydata[mykey][j]['date'].split('-');
+                    data.push([
+                        Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                        parseFloat(mydata[mykey][j]['adj_close'].toFixed(2))
+                    ]);
                 }
                 returndata.push(data);
             }
-            draw_chart(returndata);
+            draw_chart(returndata, comp);
           }
         });
 }
@@ -405,7 +414,7 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
             var data = [];
             var linedata = [];
 
-            for (var i=0; i< mydata.length; i++){
+            for (var i=0; i < mydata.length; i++){
                 var my_date = mydata[i]['date'].split('-');
                 data.push([
                     Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
@@ -445,7 +454,7 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                       returndata[1] = upper_data;
                       returndata[2] = lower_data;
 
-                      draw_chart(returndata);
+                      draw_chart(returndata, [searchtext.toUpperCase(), "Bollinger Upper", "Bollinger Lower"]);
                   }
 
                   else if(urltype=="sma"){
@@ -460,7 +469,7 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                       returndata[0] = data;
                       returndata[1] = linedata;
                       returndata[2] = [];
-                      draw_chart(returndata);
+                      draw_chart(returndata, [searchtext.toUpperCase(), "Moving Average", ""]);
                   }
 
                 });
@@ -469,7 +478,7 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                 returndata[0] = data;
                 returndata[1] = [];
                 returndata[2] = [];
-                draw_chart(returndata);
+                draw_chart(returndata, [searchtext.toUpperCase(), "", ""]);
             }
         });
     }
@@ -486,23 +495,19 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
 
 
     $(document).ready(function() {
-        var newsearch = $('#inpSearch').val();
-
-        if (newsearch.length <= 0){
-            newsearch = $('#ddlTicker').val();
-        }
-
-        var my_tickers = [newsearch];
 
         $('#example-getting-started').multiselect({
             onChange: function(option, checked) {
-                console.log(checked);
-                var index = my_tickers.indexOf(option[0].value);
+
+                var index = my_tickers.indexOf(option[0].value.toLowerCase());
                 if (index > -1 && checked == false) {
                    my_tickers.splice(index, 1);
                 }
+                else if (index > -1 && checked == true) {
+
+                }
                 else{
-                    my_tickers.push(option[0].value);
+                    my_tickers.push(option[0].value.toLowerCase());
                 }
             },
             onDropdownHide: function(event) {
