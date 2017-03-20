@@ -404,8 +404,12 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                 search_text = $('#ddlTicker').val();
             }
         }
-
         selected_time = mytime;
+
+        if(searchtext=="" && urltype == ""){
+            get_compare(selected_time, my_tickers);
+        }
+        
         $('#timeSet').html(selected_time);
             
         var url = '/chartdata/' + search_text + '/' + mytime + '/';
