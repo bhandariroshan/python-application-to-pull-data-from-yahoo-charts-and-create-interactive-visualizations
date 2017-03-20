@@ -33,11 +33,15 @@ class ChartDataMathsViewSet(APIView):
         lower_band = rm - 2 * rstd
         return upper_band, lower_band
 
-    def get(self, request, chart_type, ticker, time, *args, **kwargs):
+    def get(self, request, chart_type, ticker, period, time, *args, **kwargs):
         """Return Question Stats."""
         ticker = self.kwargs['ticker']
         time = self.kwargs['time'].replace('/', '')
         chart_type = self.kwargs['chart_type'].replace('/', '')
+        try:
+            window = int(self.kwargs['period'].replace('/', ''))
+        except:
+            window = 10
 
         filter_number = 365
         if time == '1m':
@@ -82,8 +86,8 @@ class ChartDataMathsViewSet(APIView):
         df.fillna(method="bfill", inplace="True")
 
         if chart_type == 'sma':
-            roling_mean_df = self.get_rolling_mean(df['adj_close'], 10)
-            roling_sd_df = self.get_rolling_std(df['adj_close'], 10)
+            roling_mean_df = self.get_rolling_mean(df['adj_close'], window)
+            roling_sd_df = self.get_rolling_std(df['adj_close'], window)
             roling_mean_df = roling_mean_df.dropna()
             roling_mean_df.rename('adj_close')
             data = roling_mean_df.to_dict()
@@ -95,8 +99,8 @@ class ChartDataMathsViewSet(APIView):
             return Response(newlist)
 
         elif chart_type == "bollinger":
-            roling_mean_df = self.get_rolling_mean(df['adj_close'], 10)
-            roling_sd_df = self.get_rolling_std(df['adj_close'], 10)
+            roling_mean_df = self.get_rolling_mean(df['adj_close'], window)
+            roling_sd_df = self.get_rolling_std(df['adj_close'], window)
             bollinger_band_upper_df, bollinger_band_lower_df = self.get_bollinger_bands(
                 roling_mean_df, roling_sd_df
             )
@@ -165,12 +169,16 @@ class ChartMultiTickerViewSet(APIView):
                     if len(returndata[each_data.ticker]) < filter_number:
                         returndata[each_data.ticker].append({
                             'adj_close': each_data.adj_close,
-                            'date': str(each_data.date)
+                            'date': str(each_data.date),
+                            'volume': str(each_data.volume),
+                            'ticker': str(each_data.ticker)
                         })
                 else:
                     returndata[each_data.ticker] = [{
                         'adj_close': each_data.adj_close,
-                        'date': str(each_data.date)
+                        'date': str(each_data.date),
+                        'volume': str(each_data.volume),
+                        'ticker': str(each_data.ticker)
                     }]
 
         return Response(returndata)

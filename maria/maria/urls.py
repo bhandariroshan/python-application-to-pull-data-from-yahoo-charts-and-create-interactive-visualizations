@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^chartdata/multiticker/',
         ChartMultiTickerViewSet.as_view(),
         name="multiticker"),
-    url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
+    url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)/(?P<period>.+)$',
         ChartDataMathsViewSet.as_view()),
     url('^chartdata/(?P<ticker>.+)/(?P<time>.+)$', ChartDataViewSet.as_view()),
 

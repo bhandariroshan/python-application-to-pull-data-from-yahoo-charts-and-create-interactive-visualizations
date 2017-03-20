@@ -213,6 +213,7 @@ var divCouter = 0;
 var bollingerCount = 0;
 selected_time = '1Y';
 search_text = '';
+prev = '';
 my_tickers = [];
 
 $('#inpSearch').on('change', function(){
@@ -233,7 +234,7 @@ $("#addBollinger").on('click', function(event){
          /*+ '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
          + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
          + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'*/
-         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" disabled="disabled" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + bollingerCount + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
+         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" class="bollingerWindow" onChange="get_data_and_plot(\'' + selected_time.trim() + '\',' + "''" + "," + "'bollinger'" + ')" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + bollingerCount + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
          + '</div></div>';
     $('#bollingerLi').append(my_html);
     event.stopPropagation();
@@ -246,27 +247,14 @@ $("#addSimpleMoving").on('click', function(event){
          /*+ '<span style="margin-left:10px; color: red;"><a href="#">S</a></span>'
          + '<span style="margin-left:10px; color: blue;"><a href="#">M</a></span>'
          + '<span style="margin-left:10px; color: green;"><a href="#">L</a></span>'*/
-         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" disabled="disabled" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + divCouter + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
+         + '<span style="float:right; margin-right: 20px;">Period: <input type="text" class="smaWindow" onChange="get_data_and_plot(\'' + selected_time.trim() + '\',' + "''" + "," + "'sma'" + ')" value="10" style="width:40px;"><a href="#"><i onclick="remove_div(' + divCouter + ')" class="fa fa-times" style="margin-left: 10px;" aria-hidden="true"></i></a></span>'
          + '</div></div>';
     $('#simpleMoving').append(my_html);
     event.stopPropagation();
     get_data_and_plot(selected_time, "", "sma");
 });
 
-$('#compareBtn').on('click', function(){
-    myticker = $('#ddlTicker').val();
-    search_ticker = $('#inpSearch').val();
-    console.log(search_ticker);
-    console.log(myticker);
 
-    if (search_ticker.length > 0){
-        var compare = [search_ticker, $('#compTicker').val()];
-    }
-    else{
-        var compare = [myticker, $('#compTicker').val()];   
-    }
-    get_compare(selected_time, compare);
-});
 
 function draw_chart(data=[], labeldata=[]) {        
         var chart = new Highcharts.Chart({
@@ -275,15 +263,22 @@ function draw_chart(data=[], labeldata=[]) {
             /*zoomType: 'x'*/
 
         },
-        /*tooltip: {
+        tooltip: {
             formatter: function () {
-                return  'Open: <b>' + this.point.open + '</b><br/>' + 
-                        'Close: <b>' + this.point.close + '</b><br/>' + 
-                        'High: <b>' + this.point.high + '</b><br/>' +
-                        'Low: <b>' + this.point.low + '</b><br/>' +
-                        'Volume: <b>' + this.point.volume + '</b><br/>';
+                html = '';
+                html += 'Close: <b>' + this.point.y + '</b><br/>';
+
+                if(this.point.ticker){
+                    html += 'Company: <b>' + this.point.ticker + '</b><br/>';
+                }
+
+                if (this.point.volume){
+                    html += 'Volume: <b>' + this.point.volume + '</b><br/>';
+                }
+
+                return html;
             }
-        },*/
+        },
         title: {
             text: 'Stock Trading data'
         },
@@ -381,15 +376,19 @@ function get_compare(mytime='1Y', comp=[]){
           },
           success: function(mydata) {
             //Do Something
+            console.log(comp);
             for (var i=0; i < comp.length; i++){
                 var data = [];
                 var mykey = comp[i].toUpperCase();
                 for (var j=0; j < mydata[mykey].length; j++){
                     var my_date = mydata[mykey][j]['date'].split('-');
-                    data.push([
-                        Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
-                        parseFloat(mydata[mykey][j]['adj_close'].toFixed(2))
-                    ]);
+                    data.push({
+                        x: Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                        y: parseFloat(mydata[mykey][j]['adj_close'].toFixed(2)),
+                        volume: mydata[mykey][j]['volume'],
+                        ticker: mydata[mykey][j]['ticker']
+
+                    });
                 }
                 returndata.push(data);
             }
@@ -397,6 +396,7 @@ function get_compare(mytime='1Y', comp=[]){
           }
         });
 }
+
 
 function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
         if (searchtext==""){            
@@ -413,19 +413,27 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
             var returndata = [];
             var data = [];
             var linedata = [];
-
             for (var i=0; i < mydata.length; i++){
                 var my_date = mydata[i]['date'].split('-');
-                data.push([
-                    Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
-                    parseFloat(mydata[i]['adj_close'].toFixed(2))
-                ]);
+                data.push({
+                    x: Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                    y: parseFloat(mydata[i]['adj_close'].toFixed(2)),
+                    volume: parseFloat(mydata[i]['volume'].toFixed(2)),
+                    ticker: mydata[i]['ticker']
+                });
 
             }
             
             if(urltype!=""){
                 // url('^chartdata/(?P<chart_type>.+)/(?P<ticker>.+)/(?P<time>.+)$',
-                var url = '/chartdata/' + urltype + '/' + search_text + '/' + mytime + '/';
+                if(urltype=="bollinger"){
+                    var window_period = $('.bollingerWindow')[0].value;
+                }
+                else if(urltype=="sma") {
+                    var window_period = $('.smaWindow')[0].value;   
+                }
+
+                var url = '/chartdata/' + urltype + '/' + search_text + '/' + mytime + '/' + window_period;
 
                 $.get(url, function(newdata) {
                   if(urltype=="bollinger"){
@@ -435,18 +443,20 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                     for (var j=0; j < newdata['upper'].length; j++){
                         
                         var new_date = newdata['lower'][j]['date'].split('-');
-                        upper_data.push([
-                            Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
-                            parseFloat(newdata['upper'][j]['adj_close'].toFixed(2))
-                        ]);
+                        upper_data.push({
+                            x: Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
+                            y: parseFloat(newdata['upper'][j]['adj_close'].toFixed(2)),
+                            ticker: newdata['upper'][j]['volume']
+                        });
                     }
 
                     for (var j=0; j < newdata['lower'].length; j++){
                         var new_date = newdata['lower'][j]['date'].split('-');
-                        lower_data.push([
-                            Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
-                            parseFloat(newdata['lower'][j]['adj_close'].toFixed(2))
-                        ]);
+                        lower_data.push({
+                            x: Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
+                            y: parseFloat(newdata['lower'][j]['adj_close'].toFixed(2)),
+                            ticker: newdata['lower'][j]['volume']
+                        });
 
                     }
 
@@ -460,10 +470,10 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                   else if(urltype=="sma"){
                       for (var j=0; j < newdata.length; j++){
                         var new_date = newdata[j]['date'].split('-');
-                        linedata.push([
-                            Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
-                            parseFloat(newdata[j]['adj_close'].toFixed(2))
-                        ]);
+                        linedata.push({
+                            x: Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
+                            y: parseFloat(newdata[j]['adj_close'].toFixed(2))
+                        });
                       }
 
                       returndata[0] = data;
@@ -483,40 +493,48 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
         });
     }
 
-    $('#ddlTicker').on('change', function(){
-        search_text = $('#ddlTicker').val();
-        $('#inpSearch').val(search_text);
-        get_data_and_plot();
-    });
+$('#ddlTicker').on('change', function(){
+    myticker = $('#ddlTicker').val().toLowerCase();
+    var index = my_tickers.indexOf(prev.toLowerCase());
+    if (index > -1) {
+        my_tickers.splice(index, 1);
+    }
+    
+    my_tickers.push(myticker.toLowerCase());
+    prev = myticker;
+    get_compare(selected_time, my_tickers);
+});
 
-    $(document).ready(function(){
-        get_data_and_plot();
-    });
+$(document).ready(function(){
+    my_tickers = [$('#ddlTicker').val().toLowerCase()];
+    prev = $('#ddlTicker').val().toLowerCase();
+    get_compare(selected_time, my_tickers);
+});
 
+$(document).ready(function() {
 
-    $(document).ready(function() {
+    $('#example-getting-started').multiselect({
+        onChange: function(option, checked) {
 
-        $('#example-getting-started').multiselect({
-            onChange: function(option, checked) {
-
-                var index = my_tickers.indexOf(option[0].value.toLowerCase());
-                if (index > -1 && checked == false) {
-                   my_tickers.splice(index, 1);
-                }
-                else if (index > -1 && checked == true) {
-
-                }
-                else{
-                    my_tickers.push(option[0].value.toLowerCase());
-                }
-            },
-            onDropdownHide: function(event) {
-                // alert('onDropdownHide!');
-                // call api for data
-                get_compare(selected_time, my_tickers);
+            var index = my_tickers.indexOf(option[0].value.toLowerCase());
+            if (index > -1 && checked == false) {
+               my_tickers.splice(index, 1);
             }
-        });
+            else if (index > -1 && checked == true) {
+
+            }
+            else{
+                my_tickers.push(option[0].value.toLowerCase());
+            }
+        },
+        onDropdownHide: function(event) {
+            // alert('onDropdownHide!');
+            // call api for data
+            get_compare(selected_time, my_tickers);
+        }
     });
+});
+
 </script>
 {% endblock javascript %}
 
