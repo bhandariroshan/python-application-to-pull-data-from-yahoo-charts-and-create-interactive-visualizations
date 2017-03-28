@@ -10,7 +10,7 @@ class ChartData(models.Model):
     """Exam Evaluation criteria for terminal exams."""
 
     # Attributes
-    date = models.DateField(auto_now=False, auto_now_add=False)
+    date = models.FloatField(default=0.0)
     ticker = models.CharField(max_length=50, null=True, blank=True)
     sector = models.CharField(max_length=50, null=True, blank=True)
     company_name = models.CharField(max_length=50, null=True, blank=True)

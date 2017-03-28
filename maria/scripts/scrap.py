@@ -60,9 +60,14 @@ def scrap_and_save_data(sector_tickers):
                 cd.ticker = each_ticker
                 cd.company_name = ""
                 cd.sector = sector
-                try:
-                    cd.date = row['Date']
 
+                try:
+                    import time
+                    import datetime
+                    datetime_object = datetime.datetime.strptime(row['Date'], '%Y-%m-%d')
+                    unixtime = time.mktime(datetime_object.timetuple())
+                    cd.date = (unixtime)
+                    # print(unixtime)
                 except:
                     continue
 
@@ -98,7 +103,11 @@ def scrap_and_save_data(sector_tickers):
             cd.company_name = "DJI"
             cd.sector = ""
             try:
-                cd.date = row['Date']
+                import time
+                import datetime
+                datetime_object = datetime.datetime.strptime(row['Date'], '%Y-%m-%d')
+                unixtime = time.mktime(datetime_object.timetuple())
+                cd.date = (unixtime)
             except:
                 continue
 

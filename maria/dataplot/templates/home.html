@@ -378,8 +378,9 @@ function get_compare(mytime='1Y', comp=[]){
             //Do Something
             console.log(comp);
             for (var i=0; i < comp.length; i++){
-                var data = [];
                 var mykey = comp[i].toUpperCase();
+                var data = mydata[mykey];
+                /*
                 for (var j=0; j < mydata[mykey].length; j++){
                     var my_date = mydata[mykey][j]['date'].split('-');
                     data.push({
@@ -389,7 +390,8 @@ function get_compare(mytime='1Y', comp=[]){
                         ticker: mydata[mykey][j]['ticker']
 
                     });
-                }
+                }*/
+                /*console.log(data);*/
                 returndata.push(data);
             }
             draw_chart(returndata, comp);

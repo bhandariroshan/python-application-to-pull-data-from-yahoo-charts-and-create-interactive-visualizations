@@ -92,7 +92,7 @@ class ChartDataMathsViewSet(APIView):
             roling_mean_df.rename('adj_close')
             data = roling_mean_df.to_dict()
             return_data = [
-                {'date': d.strftime("%Y-%m-%d"), 'adj_close': v}
+                {'x': d, 'y': v}
                 for d, v in data.items()
             ]
             newlist = sorted(return_data, key=lambda k: k['date'])
@@ -114,12 +114,12 @@ class ChartDataMathsViewSet(APIView):
             bfl_data = bollinger_band_lower_df.to_dict()
 
             b_upper = [
-                {'date': d.strftime("%Y-%m-%d"), 'adj_close': v}
+                {'x': d, 'y': v}
                 for d, v in bfu_data.items()
             ]
 
             b_lower = [
-                {'date': d.strftime("%Y-%m-%d"), 'adj_close': v}
+                {'x': d, 'y': v}
                 for d, v in bfl_data.items()
             ]
 
@@ -168,15 +168,15 @@ class ChartMultiTickerViewSet(APIView):
                 if each_data.ticker in returndata.keys():
                     if len(returndata[each_data.ticker]) < filter_number:
                         returndata[each_data.ticker].append({
-                            'adj_close': each_data.adj_close,
-                            'date': str(each_data.date),
+                            'y': each_data.adj_close,
+                            'x': each_data.date,
                             'volume': str(each_data.volume),
                             'ticker': str(each_data.ticker)
                         })
                 else:
                     returndata[each_data.ticker] = [{
-                        'adj_close': each_data.adj_close,
-                        'date': str(each_data.date),
+                        'y': each_data.adj_close,
+                        'x': each_data.date,
                         'volume': str(each_data.volume),
                         'ticker': str(each_data.ticker)
                     }]
