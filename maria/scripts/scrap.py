@@ -71,12 +71,12 @@ def scrap_and_save_data(sector_tickers):
                 except:
                     continue
 
-                cd.open_value = float(row['Open'])
-                cd.close_value = float(row['Close'])
-                cd.high_value = float(row['High'])
-                cd.low_value = float(row['Low'])
+                cd.open_value = float("{0:.2f}".format(row['Open']))
+                cd.close_value = float("{0:.2f}".format(row['Close']))
+                cd.high_value = float("{0:.2f}".format(row['High']))
+                cd.low_value = float("{0:.2f}".format(row['Low']))
                 cd.volume = int(row['Volume'])
-                cd.adj_close = float(row['Adj Close'])
+                cd.adj_close = float("{0:.2f}".format(row['Adj Close']))
 
                 cd.save()
 
@@ -111,12 +111,12 @@ def scrap_and_save_data(sector_tickers):
             except:
                 continue
 
-            cd.open_value = float(row['Open'])
-            cd.close_value = float(row['Close'])
-            cd.high_value = float(row['High'])
-            cd.low_value = float(row['Low'])
+            cd.open_value = float("{0:.2f}".format(row['Open']))
+            cd.close_value = float("{0:.2f}".format(row['Close']))
+            cd.high_value = float("{0:.2f}".format(row['High']))
+            cd.low_value = float("{0:.2f}".format(row['Low']))
             cd.volume = int(row['Volume'])
-            cd.adj_close = float(row['Adj Close'])
+            cd.adj_close = float("{0:.2f}".format(row['Adj Close']))
 
             cd.save()
 

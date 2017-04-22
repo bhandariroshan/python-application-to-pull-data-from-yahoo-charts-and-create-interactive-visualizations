@@ -419,10 +419,10 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
             var returndata = [];
             var data = [];
             var linedata = [];
+            console.log(mydata);
             for (var i=0; i < mydata.length; i++){
-                var my_date = mydata[i]['date'].split('-');
                 data.push({
-                    x: Date.UTC(my_date[0], my_date[1]-1, my_date[2]),
+                    x: mydata[i]['date'],
                     y: parseFloat(mydata[i]['adj_close'].toFixed(2)),
                     volume: parseFloat(mydata[i]['volume'].toFixed(2)),
                     ticker: mydata[i]['ticker']
@@ -443,15 +443,15 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
 
                 $.get(url, function(newdata) {
                   if(urltype=="bollinger"){
-                    var upper_data = [];
-                    var lower_data = [];
+                    var upper_data = [] = newdata['upper'];
+                    var lower_data = [] = newdata['lower'];;
 
-                    for (var j=0; j < newdata['upper'].length; j++){
+                    /*for (var j=0; j < newdata['upper'].length; j++){
                         
                         var new_date = newdata['lower'][j]['date'].split('-');
                         upper_data.push({
-                            x: Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
-                            y: parseFloat(newdata['upper'][j]['adj_close'].toFixed(2)),
+                            x: newdata['lower'][j]['date'],
+                            y: parseFloat(newdata['upper'][j]['adj_close']),
                             ticker: newdata['upper'][j]['volume']
                         });
                     }
@@ -459,12 +459,12 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                     for (var j=0; j < newdata['lower'].length; j++){
                         var new_date = newdata['lower'][j]['date'].split('-');
                         lower_data.push({
-                            x: Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
-                            y: parseFloat(newdata['lower'][j]['adj_close'].toFixed(2)),
+                            x: newdata['lower'][j]['date'],
+                            y: parseFloat(newdata['lower'][j]['adj_close']),
                             ticker: newdata['lower'][j]['volume']
                         });
 
-                    }
+                    }*/
 
                       returndata[0] = data;
                       returndata[1] = upper_data;
@@ -474,13 +474,14 @@ function get_data_and_plot(mytime='1Y', searchtext="", urltype=""){
                   }
 
                   else if(urltype=="sma"){
-                      for (var j=0; j < newdata.length; j++){
+                        linedata = newdata;
+                      /*for (var j=0; j < newdata.length; j++){
                         var new_date = newdata[j]['date'].split('-');
                         linedata.push({
                             x: Date.UTC(new_date[0], new_date[1]-1, new_date[2]),
                             y: parseFloat(newdata[j]['adj_close'].toFixed(2))
                         });
-                      }
+                      }*/
 
                       returndata[0] = data;
                       returndata[1] = linedata;

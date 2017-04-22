@@ -71,10 +71,10 @@ class ChartDataMathsViewSet(APIView):
         for each_data in data:
             list_data.append({
                 'date': each_data.date,
-                # 'open_value': each_data.open_value,
-                # 'close_value': each_data.close_value,
-                # 'high_value': each_data.high_value,
-                # 'low_value': each_data.low_value,
+                'open_value': each_data.open_value,
+                'close_value': each_data.close_value,
+                'high_value': each_data.high_value,
+                'low_value': each_data.low_value,
                 'ticker': each_data.ticker,
                 'adj_close': each_data.adj_close,
             })
@@ -87,15 +87,15 @@ class ChartDataMathsViewSet(APIView):
 
         if chart_type == 'sma':
             roling_mean_df = self.get_rolling_mean(df['adj_close'], window)
-            roling_sd_df = self.get_rolling_std(df['adj_close'], window)
             roling_mean_df = roling_mean_df.dropna()
             roling_mean_df.rename('adj_close')
             data = roling_mean_df.to_dict()
             return_data = [
-                {'x': d, 'y': v}
+                {'x': d, 'y': float("{0:.2f}".format(v))}
                 for d, v in data.items()
             ]
-            newlist = sorted(return_data, key=lambda k: k['date'])
+            
+            newlist = sorted(return_data, key=lambda k: k['x'])
             return Response(newlist)
 
         elif chart_type == "bollinger":
@@ -114,17 +114,17 @@ class ChartDataMathsViewSet(APIView):
             bfl_data = bollinger_band_lower_df.to_dict()
 
             b_upper = [
-                {'x': d, 'y': v}
+                {'x': d, 'y': float("{0:.2f}".format(v))}
                 for d, v in bfu_data.items()
             ]
 
             b_lower = [
-                {'x': d, 'y': v}
+                {'x': d, 'y': float("{0:.2f}".format(v))}
                 for d, v in bfl_data.items()
             ]
 
-            b_upper_sorted = sorted(b_upper, key=lambda k: k['date'])
-            b_lower_sorted = sorted(b_lower, key=lambda k: k['date'])
+            b_upper_sorted = sorted(b_upper, key=lambda k: k['x'])
+            b_lower_sorted = sorted(b_lower, key=lambda k: k['x'])
 
             return Response({'upper': b_upper_sorted, 'lower': b_lower_sorted})
 
